@@ -1,0 +1,8 @@
+﻿  OMPBegin14.cpp
+c1xx : warning C4199: двухэтапный поиск имен не поддерживается для C++/CLI, C++/CX или OpenMP. Используйте /Zc:twoPhase-
+  Создание кода
+  3 of 20 functions (15.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Создание кода завершено
+  OMPBegin14.vcxproj -> C:\Users\Анна\Source\Repos\OMPBegin14\x64\Release\OMPBegin14.exe
