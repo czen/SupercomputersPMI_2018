@@ -1,0 +1,57 @@
+{
+  "v": "4.0",
+  "name": "SupercomputersMMCS",
+  "workspace": {
+    "environments": {
+      "default": {
+        "machines": {
+          "dev-machine": {
+            "attributes": {
+              "memoryLimitBytes": "1073741824"
+            },
+            "servers": {},
+            "agents": [
+              "org.eclipse.che.ws-agent",
+              "org.eclipse.che.ssh",
+              "org.eclipse.che.terminal",
+              "org.eclipse.che.exec"
+            ]
+          }
+        },
+        "recipe": {
+          "type": "dockerfile",
+          "content": "# Copyright (c) 2012-2016 Codenvy, S.A.\n# All rights reserved. This program and the accompanying materials\n# Copyright (c) 2012-2016 Codenvy, S.A.\n# All rights reserved. This program and the accompanying materials\n# are made available under the terms of the Eclipse Public License v1.0\n# which accompanies this distribution, and is available at\n# http://www.eclipse.org/legal/epl-v10.html\n# Contributors:\n# Codenvy, S.A. - initial API and implementation\n\nFROM eclipse/stack-base:ubuntu\nENV CLANGD_VERSION 6.0\nRUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && \\\n    sudo apt-add-repository \"deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${CLANGD_VERSION} main\" && \\\n    sudo apt-get update && \\\n    sudo apt-get install g++ gcc make gdb gdbserver clang-tools-${CLANGD_VERSION} -y && \\\n    sudo apt-get install -y mpich &&\\\n    sudo apt-get clean && \\\n    sudo apt-get -y autoremove && \\\n    sudo rm -rf /var/lib/apt/lists/* && \\\n    sudo ln -s /usr/bin/clangd-${CLANGD_VERSION} /usr/bin/clangd\n\n",
+          "contentType": "text/x-dockerfile"
+        }
+      }
+    },
+    "defaultEnv": "default",
+    "projects": [
+      {
+        "links": [],
+        "name": "SupercomputersPMI_2018",
+        "attributes": {},
+        "type": "blank",
+        "source": {
+          "location": "https://github.com/czen/SupercomputersPMI_2018.git",
+          "type": "git",
+          "parameters": {}
+        },
+        "path": "/SupercomputersPMI_2018",
+        "description": "",
+        "problems": [],
+        "mixins": []
+      }
+    ],
+    "name": "parallel",
+    "commands": [],
+    "links": []
+  },
+  "id": "factoryoqxv8uluzczul8v4",
+  "creator": {
+    "name": "taccessviolation",
+    "email": "taccessviolation@gmail.com",
+    "created": 1539006455520,
+    "userId": "userq0aq1fdi7ksr4m6u"
+  }
+}
