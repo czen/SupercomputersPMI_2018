@@ -1,0 +1,6 @@
+﻿  main.cpp
+c:\users\диимон\desktop\supercomputers\individual-task1\slau\qtslau\consistent_gauss.h(7): warning C4005: 'ACCURACY': macro redefinition
+  c:\users\диимон\desktop\supercomputers\individual-task1\slau\qtslau\matrix_proc.h(9): note: see previous definition of 'ACCURACY'
+c:\users\диимон\desktop\supercomputers\individual-task1\slau\qtslau\main.cpp(25): warning C4005: 'ACCURACY': macro redefinition
+  c:\users\диимон\desktop\supercomputers\individual-task1\slau\qtslau\consistent_gauss.h(7): note: see previous definition of 'ACCURACY'
+  QtSlau.vcxproj -> C:\Users\Диимон\Desktop\SuperComputers\individual-task1\slau\QtSlau\x64\Release\QtSlau.exe
