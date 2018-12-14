@@ -1,0 +1,13 @@
+﻿  main.cpp
+c1xx : warning C4199: two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP; use /Zc:twoPhase-
+c:\users\dmitry\source\repos\individual41\individual41\main.cpp(34): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  matrix_multiplication.cpp
+c1xx : warning C4199: two-phase name lookup is not supported for C++/CLI, C++/CX, or OpenMP; use /Zc:twoPhase-
+c:\users\dmitry\source\repos\individual41\individual41\matrix_multiplication.cpp(28): warning C4018: '<': signed/unsigned mismatch
+c:\users\dmitry\source\repos\individual41\individual41\matrix_multiplication.cpp(30): warning C4018: '<': signed/unsigned mismatch
+c:\users\dmitry\source\repos\individual41\individual41\matrix_multiplication.cpp(41): warning C4018: '<': signed/unsigned mismatch
+c:\users\dmitry\source\repos\individual41\individual41\matrix_multiplication.cpp(90): warning C4018: '<': signed/unsigned mismatch
+c:\users\dmitry\source\repos\individual41\individual41\matrix_multiplication.cpp(91): warning C4018: '<': signed/unsigned mismatch
+c:\users\dmitry\source\repos\individual41\individual41\matrix_multiplication.cpp(99): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  Individual41.vcxproj -> C:\Users\Dmitry\source\repos\Individual41\Debug\Individual41.exe
