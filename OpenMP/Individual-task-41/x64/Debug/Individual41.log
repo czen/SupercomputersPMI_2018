@@ -1,0 +1,11 @@
+﻿  main.cpp
+d:\supercomp\individual41\individual41\main.cpp(15): fatal error C1083: Не удается открыть файл включение: qwidget.h: No such file or directory,
+  matrix_generation.cpp
+  matrix_multiplication.cpp
+  symmertic_matrix.cpp
+d:\supercomp\individual41\individual41\symmertic_matrix.cpp(11): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+d:\supercomp\individual41\individual41\symmertic_matrix.cpp(12): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+  upper_triangular_matrix.cpp
+d:\supercomp\individual41\individual41\upper_triangular_matrix.cpp(11): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+d:\supercomp\individual41\individual41\upper_triangular_matrix.cpp(12): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
+  Создание кода...

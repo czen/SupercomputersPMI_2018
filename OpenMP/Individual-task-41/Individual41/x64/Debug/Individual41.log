@@ -1,0 +1,4 @@
+﻿  main.cpp
+  matrix_multiplication.cpp
+c:\users\dmitry\desktop\individual41\main.cpp(101): warning C4700: uninitialized local variable 'argv' used
+  Individual41.vcxproj -> C:\Users\Dmitry\Desktop\Individual41\x64\Debug\Individual41.exe
