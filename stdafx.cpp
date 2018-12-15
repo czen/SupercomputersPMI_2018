@@ -95,9 +95,13 @@ void goProgram()
 		}
 		double start_time, end_time;
 		start_time = omp_get_wtime();
-		multParallel(a, b, c);
+		multParallelBl(a, b, c);
 		end_time = omp_get_wtime();
-		cout << "Parallel time = " << end_time - start_time << endl;
+		cout << "Parallel Block time = " << end_time - start_time << endl;
+		start_time = omp_get_wtime();
+		multParallelAssumKer(a, b, c);
+		end_time = omp_get_wtime();
+		cout << "Parallel Assum kernel time = " << end_time - start_time << endl;
 		multNonParallel(a, b, c1);
 		end_time = omp_get_wtime();
 		cout << "NonParallel time = " << end_time - start_time << endl;

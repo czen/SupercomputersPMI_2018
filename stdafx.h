@@ -22,8 +22,10 @@ struct trmat
 typedef struct trmat block_matrix;
 typedef struct trmat symmetric_matrix;
 
-void multParallel(trmat& left, trmat& right, block_matrix& result);
+void multParallelBl(trmat& left, trmat& right, block_matrix& result);
+void multParallelAssumKer(trmat& left, trmat& right, block_matrix& result);
 void multParallelBlock(trmat& left, trmat& right, block_matrix& result);
+void multParallelKerBlock(trmat& left, trmat& right, block_matrix& result);
 void multTwoBlockParallel(int *A, int *B, int *C, int n);
 void multNonParallel(trmat& left, trmat& right, block_matrix& result);
 void multNonParallelBlock(trmat& left, trmat& right, block_matrix& result);
