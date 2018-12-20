@@ -1,0 +1,3 @@
+﻿  main.cpp
+d:\supercomp\individual41\main.cpp(102): warning C4700: использована неинициализированная локальная переменная "argv"
+  Individual41.vcxproj -> D:\supercomp\Individual41\x64\Debug\Individual41.exe
