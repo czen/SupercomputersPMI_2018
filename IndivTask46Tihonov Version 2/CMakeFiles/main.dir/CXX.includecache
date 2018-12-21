@@ -1,0 +1,52 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/BlockMatrix.h
+
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/ParallelInnerMultiplier.h
+
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/ParallelOuterMultiplier.h
+
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/SequentialMultiplier.h
+
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/SymmetricMatrix.h
+
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/UpperTriangleMatrix.h
+
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/main.cpp
+algorithm
+-
+iostream
+-
+iomanip
+-
+fstream
+-
+sstream
+-
+omp.h
+-
+memory
+-
+cmath
+-
+assert.h
+-
+lib/BlockMatrix.h
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/BlockMatrix.h
+lib/UpperTriangleMatrix.h
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/UpperTriangleMatrix.h
+lib/SymmetricMatrix.h
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/SymmetricMatrix.h
+lib/SequentialMultiplier.h
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/SequentialMultiplier.h
+lib/ParallelInnerMultiplier.h
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/ParallelInnerMultiplier.h
+lib/ParallelOuterMultiplier.h
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/lib/ParallelOuterMultiplier.h
+

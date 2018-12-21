@@ -1,0 +1,3 @@
+/home/andrew/universityProjects/parallel1/gcc/CMakeFiles/rebuild_cache.dir
+/home/andrew/universityProjects/parallel1/gcc/CMakeFiles/edit_cache.dir
+/home/andrew/universityProjects/parallel1/gcc/CMakeFiles/main.dir

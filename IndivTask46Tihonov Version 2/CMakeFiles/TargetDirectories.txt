@@ -1,0 +1,3 @@
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/CMakeFiles/rebuild_cache.dir
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/CMakeFiles/main.dir
+/home/alex/Документы/Programming/MPI/parallel1 (copy)/CMakeFiles/edit_cache.dir
