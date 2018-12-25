@@ -225,7 +225,7 @@ void multParallel(block_matrix& left, block_matrix& right, block_matrix& result)
 
 void multTwoBlockParallel(int *A, int *B, int *C, int n)
 {
-#pragma simd
+#pragma omp parallel for shared(A, B, C, n) num_threads(4)
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < n; j++)
 			for (int k = 0; k < n; k++)
