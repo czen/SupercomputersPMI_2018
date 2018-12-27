@@ -1,0 +1,3 @@
+﻿  ParallelIndividualTask.cpp
+c1xx : warning C4199: двухэтапный поиск имен не поддерживается для C++/CLI, C++/CX или OpenMP. Используйте /Zc:twoPhase-
+  ParallelIndividualTask.vcxproj -> C:\Users\Анна\Source\Repos\ParallelIndividualTask\Debug\ParallelIndividualTask.exe
