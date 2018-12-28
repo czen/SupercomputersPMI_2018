@@ -30,10 +30,14 @@ struct block_matrix_col_made
 	int row_length;
 	int blocksize;
 };
-void MatrixMultiplication(block_matrix_col_made& A, block_matrix_row_made& B, block_matrix_row_made& C,
-					 bool parallel_matrix_mul, bool parallel_block_mul);
-void BlockMultiplicationParallel(int *A_block, int *B_block, int *C_block, int blocksize);
-void BlockMultiplicationNonParallel(int *A_block, int *B_block, int *C_block, int blocksize);
+void MatrixMultiplicationParallelStatic(block_matrix_col_made& A, block_matrix_row_made& B,
+										block_matrix_row_made& C);
+void MatrixMultiplicationParallelDynamic(block_matrix_col_made& A, block_matrix_row_made& B,
+										 block_matrix_row_made& C);
+void MatrixMultiplicationNonParalell(block_matrix_col_made& A, block_matrix_row_made& B,
+									 block_matrix_row_made& C);
+void BlockMultiplicationParallelStatic(int *A_block, int *B_block, int *C_block, int blocksize);
+void BlockMultiplicationParallelDynamic(int *A_block, int *B_block, int *C_block, int blocksize);
 
 int main() {
 	setlocale(LC_ALL, "Rus");
@@ -132,44 +136,23 @@ int main() {
 			}
 
 		}
-		block_matrix_row_made c4;
-		c4.col_length = size;
-		c4.blocksize = block_size;
-		c4.row = new block_matrix_row[size];
-		for (int i = 0; i < size; i++)
-		{
-			c4.row[i].blocks = new matrix_block[size];
-			c4.row[i].row_length = size;
-			for (int j = 0; j < size; j++)
-			{
-				c4.row[i].blocks[j].value = new int[block_size * block_size];
-				for (int k = 0; k < block_size * block_size; ++k)
-					c4.row[i].blocks[j].value[k] = 0;
-			}
-
-		}
 
 		double start_time, end_time;
 
 		start_time = omp_get_wtime();
-		MatrixMultiplication(a, b, c1, true, true);
+		MatrixMultiplicationParallelStatic(a, b, c1);
 		end_time = omp_get_wtime();
-		cout << "Fully Parallel time = " << end_time - start_time << endl;
+		cout << "Parallel Static time = " << end_time - start_time << endl;
 
 		start_time = omp_get_wtime();
-		MatrixMultiplication(a, b, c2, true, false);
+		MatrixMultiplicationParallelDynamic(a, b, c2);
 		end_time = omp_get_wtime();
-		cout << "Matrix Parallel + Block NonParallel time = " << end_time - start_time << endl;
+		cout << "Parallel Dynamic time = " << end_time - start_time << endl;
 
 		start_time = omp_get_wtime();
-		MatrixMultiplication(a, b, c3, false, true);
+		MatrixMultiplicationNonParalell(a, b, c3);
 		end_time = omp_get_wtime();
-		cout << "Matrix NonParallel + Block Parallel time = " << end_time - start_time << endl;
-
-		start_time = omp_get_wtime();
-		MatrixMultiplication(a, b, c4, false, false);
-		end_time = omp_get_wtime();
-		cout << "Fully NonParallel time = " << end_time - start_time << endl;
+		cout << "NonParallel time = " << end_time - start_time << endl;
 
 		/*for (int i = 0; i < size; i++)
 		{
@@ -225,17 +208,6 @@ int main() {
 			}
 			std::cout << std::endl;
 		}
-		std::cout << std::endl;
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-			{
-				for (int k = 0; k < block_size * block_size; ++k)
-					std::cout << c4.row[i].blocks[j].value[k] << " ";
-				std::cout << "|";
-			}
-			std::cout << std::endl;
-		}
 		std::cout << std::endl;*/
 
 		block_size *= 2;
@@ -244,77 +216,76 @@ int main() {
 	return 0;
 }
 
-void MatrixMultiplication(block_matrix_col_made& A, block_matrix_row_made& B, block_matrix_row_made& C,
-					 bool parallel_matrix_mul, bool parallel_block_mul)
+void MatrixMultiplicationParallelStatic(block_matrix_col_made& A, block_matrix_row_made& B,
+										block_matrix_row_made& C)
 {
-	if (parallel_matrix_mul)
-	{
-		#pragma omp parallel for shared(A, B, C) num_threads(4)
-		for (int ik = 0; ik < C.col_length; ik++)
-			for (int jk = 0; jk < C.col_length; jk++)
-				for (int k = 0; k < C.col_length; k++)
+#pragma omp parallel for schedule(static, C.col_length/4) collapse(2) shared(A, B, C) num_threads(4)
+	for (int ik = 0; ik < C.col_length; ik++)
+		for (int jk = 0; jk < C.col_length; jk++)
+			for (int k = 0; k < C.col_length; k++)
+			{
+				if (jk - C.row[k].row_length + B.row[k].row_length >= 0)
 				{
-					if (jk - C.row[k].row_length + B.row[k].row_length >= 0)
-					{
-						int nn = jk - C.row[k].row_length + B.row[k].row_length;
-						if (parallel_block_mul)
-						{
-							BlockMultiplicationParallel(A.col[k].blocks[ik].value,
-								B.row[k].blocks[nn].value,
-								C.row[ik].blocks[jk].value,
-								B.blocksize);
-						}
-						else
-						{
-							BlockMultiplicationNonParallel(A.col[k].blocks[ik].value,
-								B.row[k].blocks[nn].value,
-								C.row[ik].blocks[jk].value,
-								B.blocksize);
-						}
-					}
+					int nn = jk - C.row[k].row_length + B.row[k].row_length;
+					BlockMultiplicationParallelStatic(A.col[k].blocks[ik].value,
+						B.row[k].blocks[nn].value,
+						C.row[ik].blocks[jk].value,
+						B.blocksize);
 				}
-	}
-	else
-	{
-		for (int ik = 0; ik < C.col_length; ik++)
-			for (int jk = 0; jk < C.col_length; jk++)
-				for (int k = 0; k < C.col_length; k++)
-				{
-					if (jk - C.row[k].row_length + B.row[k].row_length >= 0)
-					{
-						int nn = jk - C.row[k].row_length + B.row[k].row_length;
-						if (parallel_block_mul)
-						{
-							BlockMultiplicationParallel(A.col[k].blocks[ik].value,
-								B.row[k].blocks[nn].value,
-								C.row[ik].blocks[jk].value,
-								B.blocksize);
-						}
-						else
-						{
-							BlockMultiplicationNonParallel(A.col[k].blocks[ik].value,
-								B.row[k].blocks[nn].value,
-								C.row[ik].blocks[jk].value,
-								B.blocksize);
-						}
-					}
-				}
-	}
+			}
 }
 
-void BlockMultiplicationParallel(int *A_block, int *B_block, int *C_block, int blocksize)
+void MatrixMultiplicationParallelDynamic(block_matrix_col_made& A, block_matrix_row_made& B,
+	block_matrix_row_made& C)
 {
-#pragma omp parallel for shared(A_block, B_block, C_block, blocksize) num_threads(4)
+#pragma omp parallel for schedule(dynamic, C.col_length/4) collapse(2) shared(A, B, C) num_threads(4)
+	for (int ik = 0; ik < C.col_length; ik++)
+		for (int jk = 0; jk < C.col_length; jk++)
+			for (int k = 0; k < C.col_length; k++)
+			{
+				if (jk - C.row[k].row_length + B.row[k].row_length >= 0)
+				{
+					int nn = jk - C.row[k].row_length + B.row[k].row_length;
+					BlockMultiplicationParallelDynamic(A.col[k].blocks[ik].value,
+						B.row[k].blocks[nn].value,
+						C.row[ik].blocks[jk].value,
+						B.blocksize);
+				}
+			}
+}
+
+void MatrixMultiplicationNonParalell(block_matrix_col_made& A, block_matrix_row_made& B,
+									 block_matrix_row_made& C)
+{
+	for (int ik = 0; ik < C.col_length; ik++)
+		for (int jk = 0; jk < C.col_length; jk++)
+			for (int kk = 0; kk < C.col_length; kk++)
+				if (jk - C.row[kk].row_length + B.row[kk].row_length >= 0)
+				{
+					int nn = jk - C.row[kk].row_length + B.row[kk].row_length;
+					for (int i = 0; i < C.blocksize; i++)
+						for (int j = 0; j < C.blocksize; j++)
+							for (int k = 0; k < C.blocksize; k++)
+								C.row[ik].blocks[jk].value[i*C.blocksize + j] +=
+								A.col[kk].blocks[ik].value[i*C.blocksize + k] *
+								B.row[kk].blocks[nn].value[k*C.blocksize + j];
+				}
+}
+
+void BlockMultiplicationParallelStatic(int *A_block, int *B_block, int *C_block, int blocksize)
+{
+#pragma omp parallel for schedule(static, blocksize/4) collapse(2) shared(A_block, B_block, C_block, blocksize) num_threads(4)
 	for (int i = 0; i < blocksize; i++)
 		for (int j = 0; j < blocksize; j++)
 			for (int k = 0; k < blocksize; k++)
-				C_block[i*blocksize + j] += A_block[i*blocksize + k] * B_block[j*blocksize + k];
+				C_block[i*blocksize + j] += A_block[i*blocksize + k] * B_block[k*blocksize + j];
 }
 
-void BlockMultiplicationNonParallel(int *A_block, int *B_block, int *C_block, int blocksize)
+void BlockMultiplicationParallelDynamic(int *A_block, int *B_block, int *C_block, int blocksize)
 {
+#pragma omp parallel for schedule(dynamic, blocksize/4) collapse(2) shared(A_block, B_block, C_block, blocksize) num_threads(4)
 	for (int i = 0; i < blocksize; i++)
 		for (int j = 0; j < blocksize; j++)
 			for (int k = 0; k < blocksize; k++)
-				C_block[i*blocksize + j] += A_block[i*blocksize + k] * B_block[j*blocksize + k];
+				C_block[i*blocksize + j] += A_block[i*blocksize + k] * B_block[k*blocksize + j];
 }
