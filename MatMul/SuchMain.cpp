@@ -8,8 +8,9 @@
 using namespace std;
 
 #define THREADS_NUM 8
-#define BSIZE 4;
-#define MN 2048;
+#define BMN 1024	// block BMN x BMN
+#define BSIZE (int)pow(BMN,2) // BSIZE = BMN x BMN
+#define MN 1024
 
 void copyThat(int *src, int* dest, int n)
 {
@@ -26,8 +27,8 @@ void nullify(int *C, int n) {
 void CreateMatrix(int*A, int*B, int n) {
 	for (int j = 0; j < n; j++) {
 		for (int i = j; i < n; i++) {
-			A[i*n + j] = rand() % 100;
-			B[i*n + j] = rand() % 100;
+			A[i*n + j] = rand() % 100 + 1;
+			B[i*n + j] = rand() % 100 + 1;
 		}
 	}
 	for (int i = 0; i < n; i++) {
@@ -75,10 +76,13 @@ int* MatrixMult(int* A, int* B, int n) {
 	int* NewArr = new int[n*n];
 	nullify(NewArr, n);
 	double t1 = omp_get_wtime();
-	for (int j = 0; j < n; j++)
-		for (int i = j; i < n; i++)
-			for (int k = 0; k < n; k++)
-				NewArr[i*n + j] += A[i*n + k] * B[j + k * n];
+	//for (int j = 0; j < n; j++)
+	//	for (int i = j; i < n; i++)
+	//		for (int k = j; k < n; k++)
+	//			NewArr[i*n + j] += A[i*n + k] * B[j + k * n];
+	for (int block = 0; block < n*n; block++)
+		for (int k = block % n; k < block / n + 1; k++)
+			NewArr[block] += A[(block / n) * n + k] * B[block % n + k * n];
 	double t2 = omp_get_wtime();
 	double nptime = (t2 - t1) * 1000;
 	cout << "Non-parallel non-blocked time: " << nptime << endl;
@@ -92,19 +96,26 @@ int* MatrixMultBlock(int* A, int* B, int n) {
 	int sqrtBSize = (int)sqrt(bSize);
 	int blocksInRow = (int)(n / sqrtBSize);
 	double t1 = omp_get_wtime();
-	for (int blockNumber = 0; blockNumber < n*n / bSize; blockNumber++) {
-		for (int realBlockNumber = blockNumber % blocksInRow; realBlockNumber < blockNumber / blocksInRow + 1; realBlockNumber++) {
-			for (int i = 0; i < sqrtBSize; i++) {
-				for (int j = 0; j < sqrtBSize; j++) {
-					for (int k = 0; k < sqrtBSize; k++) {
-						NewArr[bSize*blockNumber + sqrtBSize * i + j] +=
-							A[bSize*(blockNumber / blocksInRow)*blocksInRow + bSize * realBlockNumber + sqrtBSize * i + k] *
-							B[bSize*realBlockNumber*blocksInRow + bSize * (blockNumber % blocksInRow) + sqrtBSize * k + j];
+	if (sqrtBSize != n) {
+		for (int blockNumber = 0; blockNumber < n*n / bSize; blockNumber++) {
+			for (int realBlockNumber = blockNumber % blocksInRow; realBlockNumber < blockNumber / blocksInRow + 1; realBlockNumber++) {
+				for (int i = 0; i < sqrtBSize; i++) {
+					for (int j = 0; j < sqrtBSize; j++) {
+						for (int k = 0; k < sqrtBSize; k++) {
+							NewArr[bSize*blockNumber + sqrtBSize * i + j] +=
+								A[bSize*(blockNumber / blocksInRow)*blocksInRow + bSize * realBlockNumber + sqrtBSize * i + k] *
+								B[bSize*realBlockNumber*blocksInRow + bSize * (blockNumber % blocksInRow) + sqrtBSize * k + j];
+						}
 					}
 				}
 			}
 		}
 	}
+	else
+		for (int j = 0; j < sqrtBSize; j++)
+			for (int i = j; i < sqrtBSize; i++)
+				for (int k = j; k < sqrtBSize; k++)
+					NewArr[sqrtBSize * i + j] += A[sqrtBSize * i + k] * B[sqrtBSize * k + j];
 	double t2 = omp_get_wtime();
 	double nptime = (t2 - t1) * 1000;
 	cout << "Non-parallel time: " << nptime << endl;
@@ -135,20 +146,30 @@ int* MatrixMultBlockPar1(int* A, int* B, int n) {
 		{
 			cout << "num_threads: " << omp_get_num_threads() << endl;
 		}
-		if (omp_get_thread_num() / numberOfBlocks == 0) {
-			for (int blockNumber = partThread * omp_get_thread_num(); blockNumber < partThread*(1 + omp_get_thread_num()); blockNumber++) {
-				for (int realBlockNumber = blockNumber % blocksInRow; realBlockNumber < blockNumber / blocksInRow + 1; realBlockNumber++) {
-					for (int i = 0; i < sqrtBSize; i++) {
-						for (int j = 0; j < sqrtBSize; j++) {
-							for (int k = 0; k < sqrtBSize; k++) {
-								NewArr[bSize*blockNumber + sqrtBSize * i + j] +=
-									A[bSize*(blockNumber / blocksInRow)*blocksInRow + bSize * realBlockNumber + sqrtBSize * i + k] *
-									B[bSize*realBlockNumber*blocksInRow + bSize * (blockNumber % blocksInRow) + sqrtBSize * k + j];
+		if (sqrtBSize != n) {
+			if (omp_get_thread_num() / numberOfBlocks == 0) {
+				for (int blockNumber = partThread * omp_get_thread_num(); blockNumber < partThread*(1 + omp_get_thread_num()); blockNumber++) {
+					for (int realBlockNumber = blockNumber % blocksInRow; realBlockNumber < blockNumber / blocksInRow + 1; realBlockNumber++) {
+						for (int i = 0; i < sqrtBSize; i++) {
+							for (int j = 0; j < sqrtBSize; j++) {
+								for (int k = 0; k < sqrtBSize; k++) {
+									NewArr[bSize*blockNumber + sqrtBSize * i + j] +=
+										A[bSize*(blockNumber / blocksInRow)*blocksInRow + bSize * realBlockNumber + sqrtBSize * i + k] *
+										B[bSize*realBlockNumber*blocksInRow + bSize * (blockNumber % blocksInRow) + sqrtBSize * k + j];
+								}
 							}
 						}
 					}
 				}
 			}
+		}
+		else
+		{
+#pragma omp for
+			for (int j = 0; j < sqrtBSize; j++)
+				for (int i = j; i < sqrtBSize; i++)
+					for (int k = j; k < sqrtBSize; k++)
+						NewArr[sqrtBSize * i + j] += A[sqrtBSize * i + k] * B[sqrtBSize * k + j];
 		}
 	}
 	t2 = omp_get_wtime();
@@ -170,20 +191,28 @@ int* MatrixMultBlockPar2(int* A, int* B, int n) {
 	t1 = omp_get_wtime();
 #pragma omp parallel num_threads(THREADS_NUM)
 	{
+		if (sqrtBSize != n) {
 #pragma omp for
-		for (int blockNumber = 0; blockNumber < n*n / bSize; blockNumber++) {
-			for (int realBlockNumber = blockNumber % blocksInRow; realBlockNumber < blockNumber / blocksInRow + 1; realBlockNumber++) {
-				for (int i = 0; i < sqrtBSize; i++) {
-					for (int j = 0; j < sqrtBSize; j++) {
-						for (int k = 0; k < sqrtBSize; k++) {
-							NewArr[bSize*blockNumber + sqrtBSize * i + j] +=
-								A[bSize*(blockNumber / blocksInRow)*blocksInRow + bSize * realBlockNumber + sqrtBSize * i + k] *
-								B[bSize*realBlockNumber*blocksInRow + bSize * (blockNumber % blocksInRow) + sqrtBSize * k + j];
+			for (int blockNumber = 0; blockNumber < n*n / bSize; blockNumber++) {
+				for (int realBlockNumber = blockNumber % blocksInRow; realBlockNumber < blockNumber / blocksInRow + 1; realBlockNumber++) {
+					for (int i = 0; i < sqrtBSize; i++) {
+						for (int j = 0; j < sqrtBSize; j++) {
+							for (int k = 0; k < sqrtBSize; k++) {
+								NewArr[bSize*blockNumber + sqrtBSize * i + j] +=
+									A[bSize*(blockNumber / blocksInRow)*blocksInRow + bSize * realBlockNumber + sqrtBSize * i + k] *
+									B[bSize*realBlockNumber*blocksInRow + bSize * (blockNumber % blocksInRow) + sqrtBSize * k + j];
+							}
 						}
 					}
 				}
 			}
 		}
+		else
+#pragma omp for
+			for (int j = 0; j < sqrtBSize; j++)
+				for (int i = j; i < sqrtBSize; i++)
+					for (int k = j; k < sqrtBSize; k++)
+						NewArr[sqrtBSize * i + j] += A[sqrtBSize * i + k] * B[sqrtBSize * k + j];
 	}
 	t2 = omp_get_wtime();
 	cout << "Total parallel time of 2 algotirhm: " << (t2 - t1) * 1000 << endl;
@@ -200,14 +229,22 @@ int main()
 
 	int *CC = MatrixMult(A, B, n);
 
+	copyThat(A, C, n);
+	A = EncodeMatrix(A, n);
+	A = DecodeMatrix(A, n);
+	for (int i = 0; i < n*n; i++) {
+		assert(A[i]==C[i]);
+	}
 	A = EncodeMatrix(A, n);
 	B = EncodeMatrix(B, n);
 
 	int* M1 = MatrixMultBlock(A, B, n);
 	int* M2 = MatrixMultBlockPar1(A, B, n);
 	int* M3 = MatrixMultBlockPar2(A, B, n);
-	for (int i = 0; i < n*n; i++)
-		assert(M1[i] == M2[i] && M2[i] == M3[i]);
+	for (int i = 0; i < n*n; i++) {
+		assert(M1[i] == M2[i]);
+		assert(M2[i] == M3[i]);
+	}
 
 	C = DecodeMatrix(M3, n);
 
