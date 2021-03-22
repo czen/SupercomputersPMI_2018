@@ -15,6 +15,8 @@
 #define NCA 15                 /* number of columns in matrix A */
 #define NCB 7                  /* number of columns in matrix B */
 
+
+
 int main (int argc, char *argv[]) 
 {
 int	tid, nthreads, i, j, k, chunk;
@@ -24,7 +26,9 @@ double	a[NRA][NCA],           /* matrix A to be multiplied */
 
 chunk = 10;                    /* set loop iteration chunk size */
 
-/*** Spawn a parallel region explicitly scoping all variables ***/
+	
+	
+/*** Spawn a parallel region explicitly scoping all variables hope this works ***/
 #pragma omp parallel shared(a,b,c,nthreads,chunk) private(tid,i,j,k)
   {
   tid = omp_get_thread_num();
@@ -47,6 +51,8 @@ chunk = 10;                    /* set loop iteration chunk size */
   for (i=0; i<NRA; i++)
     for (j=0; j<NCB; j++)
       c[i][j]= 0;
+	  
+	  
 
   /*** Do matrix multiply sharing iterations on outer loop ***/
   /*** Display who does which iterations for demonstration purposes ***/
@@ -60,6 +66,8 @@ chunk = 10;                    /* set loop iteration chunk size */
         c[i][j] += a[i][k] * b[k][j];
     }
   }   /*** End of parallel region ***/
+	
+	
 
 /*** Print results ***/
 printf("******************************************************\n");
